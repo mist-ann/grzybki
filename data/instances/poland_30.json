@@ -1,0 +1,164 @@
+{
+  "name": "poland_30",
+  "description": "Curated Polish city terminal set for idealized FGO experiments.",
+  "source": "Approximate city-centre coordinates curated from public geographic references; verify before operational use.",
+  "license": "CC0-1.0 for this curated coordinate file.",
+  "crs": "EPSG:4326",
+  "terminals": [
+    {
+      "name": "Warszawa",
+      "lon": 21.0122,
+      "lat": 52.2297
+    },
+    {
+      "name": "Kraków",
+      "lon": 19.9445,
+      "lat": 50.0647
+    },
+    {
+      "name": "Łódź",
+      "lon": 19.456,
+      "lat": 51.7592
+    },
+    {
+      "name": "Wrocław",
+      "lon": 17.0385,
+      "lat": 51.1079
+    },
+    {
+      "name": "Poznań",
+      "lon": 16.9252,
+      "lat": 52.4064
+    },
+    {
+      "name": "Gdańsk",
+      "lon": 18.6466,
+      "lat": 54.352
+    },
+    {
+      "name": "Szczecin",
+      "lon": 14.5528,
+      "lat": 53.4285
+    },
+    {
+      "name": "Bydgoszcz",
+      "lon": 18.004,
+      "lat": 53.1235
+    },
+    {
+      "name": "Lublin",
+      "lon": 22.5684,
+      "lat": 51.2465
+    },
+    {
+      "name": "Białystok",
+      "lon": 23.1688,
+      "lat": 53.1325
+    },
+    {
+      "name": "Katowice",
+      "lon": 19.0238,
+      "lat": 50.2649
+    },
+    {
+      "name": "Częstochowa",
+      "lon": 19.1203,
+      "lat": 50.8118
+    },
+    {
+      "name": "Radom",
+      "lon": 21.1471,
+      "lat": 51.4027
+    },
+    {
+      "name": "Rzeszów",
+      "lon": 21.999,
+      "lat": 50.0413
+    },
+    {
+      "name": "Toruń",
+      "lon": 18.5984,
+      "lat": 53.0138
+    },
+    {
+      "name": "Kielce",
+      "lon": 20.6286,
+      "lat": 50.8661
+    },
+    {
+      "name": "Olsztyn",
+      "lon": 20.4801,
+      "lat": 53.7784
+    },
+    {
+      "name": "Bielsko-Biała",
+      "lon": 19.0578,
+      "lat": 49.8224
+    },
+    {
+      "name": "Zielona Góra",
+      "lon": 15.5062,
+      "lat": 51.9356
+    },
+    {
+      "name": "Opole",
+      "lon": 17.9213,
+      "lat": 50.6751
+    },
+    {
+      "name": "Gorzów Wielkopolski",
+      "lon": 15.2288,
+      "lat": 52.7368
+    },
+    {
+      "name": "Elbląg",
+      "lon": 19.4088,
+      "lat": 54.1522
+    },
+    {
+      "name": "Płock",
+      "lon": 19.7064,
+      "lat": 52.5468
+    },
+    {
+      "name": "Tarnów",
+      "lon": 20.986,
+      "lat": 50.0121
+    },
+    {
+      "name": "Koszalin",
+      "lon": 16.1814,
+      "lat": 54.1943
+    },
+    {
+      "name": "Włocławek",
+      "lon": 19.0678,
+      "lat": 52.6483
+    },
+    {
+      "name": "Kalisz",
+      "lon": 18.089,
+      "lat": 51.7611
+    },
+    {
+      "name": "Legnica",
+      "lon": 16.1619,
+      "lat": 51.207
+    },
+    {
+      "name": "Słupsk",
+      "lon": 17.0287,
+      "lat": 54.4641
+    },
+    {
+      "name": "Nowy Sącz",
+      "lon": 20.697,
+      "lat": 49.6218
+    }
+  ],
+  "metadata": {
+    "generator": "curated_city_centres",
+    "coordinate_precision": "approximately 0.001 degrees",
+    "notes": "Coordinates are approximate city centres, not station locations."
+  }
+}

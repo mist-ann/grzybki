@@ -1,0 +1,89 @@
+{
+  "name": "poland_15",
+  "description": "Curated Polish city terminal set for idealized FGO experiments.",
+  "source": "Approximate city-centre coordinates curated from public geographic references; verify before operational use.",
+  "license": "CC0-1.0 for this curated coordinate file.",
+  "crs": "EPSG:4326",
+  "terminals": [
+    {
+      "name": "Warszawa",
+      "lon": 21.0122,
+      "lat": 52.2297
+    },
+    {
+      "name": "Kraków",
+      "lon": 19.9445,
+      "lat": 50.0647
+    },
+    {
+      "name": "Łódź",
+      "lon": 19.456,
+      "lat": 51.7592
+    },
+    {
+      "name": "Wrocław",
+      "lon": 17.0385,
+      "lat": 51.1079
+    },
+    {
+      "name": "Poznań",
+      "lon": 16.9252,
+      "lat": 52.4064
+    },
+    {
+      "name": "Gdańsk",
+      "lon": 18.6466,
+      "lat": 54.352
+    },
+    {
+      "name": "Szczecin",
+      "lon": 14.5528,
+      "lat": 53.4285
+    },
+    {
+      "name": "Bydgoszcz",
+      "lon": 18.004,
+      "lat": 53.1235
+    },
+    {
+      "name": "Lublin",
+      "lon": 22.5684,
+      "lat": 51.2465
+    },
+    {
+      "name": "Białystok",
+      "lon": 23.1688,
+      "lat": 53.1325
+    },
+    {
+      "name": "Katowice",
+      "lon": 19.0238,
+      "lat": 50.2649
+    },
+    {
+      "name": "Częstochowa",
+      "lon": 19.1203,
+      "lat": 50.8118
+    },
+    {
+      "name": "Radom",
+      "lon": 21.1471,
+      "lat": 51.4027
+    },
+    {
+      "name": "Rzeszów",
+      "lon": 21.999,
+      "lat": 50.0413
+    },
+    {
+      "name": "Toruń",
+      "lon": 18.5984,
+      "lat": 53.0138
+    }
+  ],
+  "metadata": {
+    "generator": "curated_city_centres",
+    "coordinate_precision": "approximately 0.001 degrees",
+    "notes": "Coordinates are approximate city centres, not station locations."
+  }
+}
