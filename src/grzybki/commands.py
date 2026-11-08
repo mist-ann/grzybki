@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -90,17 +91,36 @@ def run_optimize(
         extra=extra,
     )
 
+    start_evals = resume_state.t if resume_state is not None else 0
+    remaining_evals = max(max_evals - start_evals, 0)
+
     writer = RunWriter(run_dir, manifest, append=append)
     try:
-        optimizer = FGOOptimizer(
-            problem.evaluate,
-            problem.dimension,
-            config,
-            checkpoint_dir=writer.checkpoint_dir,
-            on_evaluation=writer.append_history,
-            on_snapshot=writer.append_snapshot,
-        )
-        result = optimizer.run(resume=resume_state)
+        def _show_item(record: dict[str, Any] | None) -> str | None:
+            if record is None:
+                return None
+            return f"best J = {record['best_score']:.4f}"
+
+        with click.progressbar(
+            length=remaining_evals,
+            label=f"optimizing {instance.name}",
+            item_show_func=_show_item,
+            file=sys.stderr,
+        ) as bar:
+
+            def _on_evaluation(record: dict[str, Any]) -> None:
+                writer.append_history(record)
+                bar.update(1, current_item=record)
+
+            optimizer = FGOOptimizer(
+                problem.evaluate,
+                problem.dimension,
+                config,
+                checkpoint_dir=writer.checkpoint_dir,
+                on_evaluation=_on_evaluation,
+                on_snapshot=writer.append_snapshot,
+            )
+            result = optimizer.run(resume=resume_state)
         decoded = problem.evaluate(result.best_vector)
         best_payload = {
             "schema_version": SCHEMA_VERSION,
