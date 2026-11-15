@@ -8,9 +8,10 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-DEFAULT_BBOX = "14.0,49.0,24.2,54.9"
+DEFAULT_COUNTRY = "PL"
 DEFAULT_ENDPOINT = "https://overpass-api.de/api/interpreter"
-DEFAULT_RAILWAY = "rail|light_rail|narrow_gauge|subway|tram"
+DEFAULT_RAILWAY = "rail"
+DEFAULT_USAGE = "main|branch"
 ATTRIBUTION = "© OpenStreetMap contributors, ODbL 1.0"
 
 
@@ -25,13 +26,38 @@ def parse_bbox(value: str) -> tuple[float, float, float, float]:
 
 
 def build_query(
-    bbox: tuple[float, float, float, float], railway: str, timeout: int
+    railway: str,
+    timeout: int,
+    *,
+    country: str | None = DEFAULT_COUNTRY,
+    bbox: tuple[float, float, float, float] | None = None,
+    usage: str | None = DEFAULT_USAGE,
+    include_service: bool = False,
 ) -> str:
-    min_lon, min_lat, max_lon, max_lat = bbox
-    overpass_bbox = f"{min_lat},{min_lon},{max_lat},{max_lon}"
+    """Build an Overpass query for railway ways.
+
+    By default the query is clipped to the country's boundary (ISO 3166-1
+    code), keeps only ``usage=main|branch`` lines, and drops service tracks
+    (sidings, yards, spurs), which would otherwise dominate the geometry.
+    """
+    filters = f'["railway"~"^({railway})$"]'
+    if usage:
+        filters += f'["usage"~"^({usage})$"]'
+    if not include_service:
+        filters += '[!"service"]'
+    if bbox is not None:
+        min_lon, min_lat, max_lon, max_lat = bbox
+        scope = f"({min_lat},{min_lon},{max_lat},{max_lon})"
+        prefix = ""
+    elif country:
+        prefix = f'area["ISO3166-1"="{country}"][admin_level=2]->.region;'
+        scope = "(area.region)"
+    else:
+        raise ValueError("either country or bbox is required")
     return (
         f"[out:json][timeout:{timeout}];"
-        f'way["railway"~"{railway}"]({overpass_bbox});'
+        f"{prefix}"
+        f"way{filters}{scope};"
         "out geom;"
     )
 
@@ -80,9 +106,31 @@ def to_geojson(payload: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch OSM railway lines as GeoJSON")
-    parser.add_argument("--bbox", type=parse_bbox, default=parse_bbox(DEFAULT_BBOX))
+    parser.add_argument(
+        "--country",
+        default=DEFAULT_COUNTRY,
+        help="ISO 3166-1 code of the clipping boundary (ignored with --bbox)",
+    )
+    parser.add_argument(
+        "--bbox",
+        type=parse_bbox,
+        default=None,
+        help="min_lon,min_lat,max_lon,max_lat; overrides --country",
+    )
     parser.add_argument("--endpoint", default=DEFAULT_ENDPOINT)
-    parser.add_argument("--railway", default=DEFAULT_RAILWAY)
+    parser.add_argument(
+        "--railway", default=DEFAULT_RAILWAY, help="regex of railway=* values"
+    )
+    parser.add_argument(
+        "--usage",
+        default=DEFAULT_USAGE,
+        help="regex of usage=* values; empty string disables the filter",
+    )
+    parser.add_argument(
+        "--include-service",
+        action="store_true",
+        help="keep sidings, yards, spurs and other service=* tracks",
+    )
     parser.add_argument("--timeout", type=int, default=180)
     parser.add_argument(
         "--cache", type=Path, default=Path("data/reference/osm_rail_poland.json")
@@ -98,7 +146,14 @@ def main() -> None:
         with args.cache.open("r", encoding="utf-8") as handle:
             payload = json.load(handle)
     else:
-        query = build_query(args.bbox, args.railway, args.timeout)
+        query = build_query(
+            args.railway,
+            args.timeout,
+            country=args.country,
+            bbox=args.bbox,
+            usage=args.usage or None,
+            include_service=args.include_service,
+        )
         payload = fetch(args.endpoint, query, args.timeout)
         with args.cache.open("w", encoding="utf-8") as handle:
             json.dump(payload, handle)

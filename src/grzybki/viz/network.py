@@ -68,7 +68,7 @@ def draw_network(
                     label=reference.get("label", "reference"),
                 )
             )
-        if len(reference_points):
+        elif len(reference_points):
             ax.scatter(
                 reference_points[:, 0],
                 reference_points[:, 1],

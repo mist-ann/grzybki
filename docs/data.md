@@ -56,12 +56,24 @@ Fetchers are optional, require network access, and write to `data/reference/`, w
 ### OpenStreetMap rail lines
 
 ```bash
-python3 scripts/fetch_osm_rail.py \
-  --bbox 14.0,49.0,24.2,54.9 \
-  --out data/reference/osm_rail_poland.geojson
+python3 scripts/fetch_osm_rail.py --out data/reference/osm_rail_poland.geojson
 ```
 
-The script queries the Overpass API for ways tagged `railway` with `rail`, `light_rail`, `narrow_gauge`, `subway`, or `tram`, and writes GeoJSON `LineString` features. The default cache is `data/reference/osm_rail_poland.json`. Use `--force` to refresh the cache.
+By default the script queries the Overpass API for ways tagged `railway=rail` with `usage=main` or `usage=branch`, clipped to Poland's administrative boundary (`--country PL`), and drops service tracks (`service=*`: sidings, yards, spurs). It writes GeoJSON `LineString` features. In November 2026 this returned about 27,500 ways (about 500,000 vertices, 28 MB GeoJSON) and took about 2.5 minutes.
+
+Useful overrides:
+
+- `--bbox min_lon,min_lat,max_lon,max_lat` replaces the country boundary with a bounding box.
+- `--railway 'rail|light_rail|narrow_gauge'` widens the `railway=*` filter (a regex).
+- `--usage ''` disables the `usage=*` filter; `--include-service` keeps service tracks.
+
+The default cache is `data/reference/osm_rail_poland.json`. Use `--force` to refresh the cache; changing filters without `--force` reuses the old cached response.
+
+Overlay the result on a run with:
+
+```bash
+grzybki visualize runs/poland_30_seed42 --reference data/reference/osm_rail_poland.geojson
+```
 
 Attribution: © OpenStreetMap contributors, ODbL 1.0.
 
