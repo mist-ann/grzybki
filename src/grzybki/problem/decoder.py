@@ -46,6 +46,8 @@ class NetworkProblem:
                 raise ValueError("instance must be projected or contain lon/lat")
         self._terminals = self.instance.xy
         self._baseline = terminal_mst_baseline(self._terminals)
+        projection = self.instance.projection
+        self._km_per_unit = projection.km_per_unit if projection is not None else None
 
     @property
     def dimension(self) -> int:
@@ -59,6 +61,10 @@ class NetworkProblem:
     def baseline(self) -> MSTBaseline:
         return self._baseline
 
+    @property
+    def km_per_unit(self) -> float | None:
+        return self._km_per_unit
+
     def evaluate(self, vector: np.ndarray) -> DecodedNetwork:
         return decode(
             vector,
@@ -66,10 +72,13 @@ class NetworkProblem:
             K=self.K,
             weights=self.weights,
             baseline=self._baseline,
+            km_per_unit=self._km_per_unit,
         )
 
     def evaluate_graph(self, graph: NetworkGraph) -> Metrics:
-        return compute_metrics(graph, self.weights, self._baseline)
+        return compute_metrics(
+            graph, self.weights, self._baseline, km_per_unit=self._km_per_unit
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -81,7 +90,13 @@ class NetworkProblem:
             "baseline": {
                 "C_mst": self._baseline.cost,
                 "D_mst": self._baseline.detour,
+                "C_mst_km": (
+                    None
+                    if self._km_per_unit is None
+                    else self._baseline.cost * self._km_per_unit
+                ),
             },
+            "km_per_unit": self._km_per_unit,
         }
 
 
@@ -91,6 +106,7 @@ def decode(
     K: int,
     weights: ObjectiveWeights | None = None,
     baseline: MSTBaseline | None = None,
+    km_per_unit: float | None = None,
 ) -> DecodedNetwork:
     vector = np.asarray(vector, dtype=float).reshape(-1)
     expected = 2 * K + 1
@@ -109,7 +125,7 @@ def decode(
     points = np.vstack([terminals, steiner])
     theta = float(vector[-1])
     graph = build_network(points, terminal_count=len(terminals), theta=theta)
-    metrics = compute_metrics(graph, weights, baseline)
+    metrics = compute_metrics(graph, weights, baseline, km_per_unit=km_per_unit)
     return DecodedNetwork(
         vector=vector.copy(),
         graph=graph,

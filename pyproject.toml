@@ -30,7 +30,7 @@ grzybki = "grzybki.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-grzybki = ["py.typed"]
+grzybki = ["py.typed", "data/*.geojson"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

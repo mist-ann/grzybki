@@ -1,9 +1,13 @@
 from .animation import render_frame, write_animation
+from .basemap import Basemap, build_basemap, load_outline
 from .convergence import plot_convergence, plot_metrics
 from .network import draw_network, plot_decoded, plot_network
 from .report import write_report
 
 __all__ = [
+    "Basemap",
+    "build_basemap",
+    "load_outline",
     "draw_network",
     "plot_convergence",
     "plot_decoded",

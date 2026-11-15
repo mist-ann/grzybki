@@ -62,7 +62,7 @@ The objective is:
 J = w1 * C / C_MST + w2 * D / D_MST + w3 * (1 - FT)
 ```
 
-Defaults are `(w1, w2, w3) = (0.4, 0.4, 0.2)`. The terminal-only MST has `J = 1`; lower values are better. See [docs/algorithm_spec.md](docs/algorithm_spec.md) for formulas, draw order, and documented deviations.
+Defaults are `(w1, w2, w3) = (0.4, 0.4, 0.2)`. The terminal-only MST has `J = 1`; lower values are better. For geographic instances, metrics also report the network length in kilometres (`C_km`). See [docs/algorithm_spec.md](docs/algorithm_spec.md) for formulas, draw order, and documented deviations.
 
 ## CLI
 
@@ -107,6 +107,8 @@ grzybki visualize RUN_DIR [OPTIONS]
 | `--dpi INT` | `140` | Figure resolution |
 | `--reference PATH` | off | Optional GeoJSON reference lines |
 | `--report` | on | Write `report.html` |
+| `--labels/--no-labels` | on | Label terminals with their names; labels are placed to avoid each other and the nodes |
+| `--outline/--no-outline` | on | Draw the Poland border (Natural Earth, bundled) when most terminals fall inside it |
 
 ## Run artifacts
 
@@ -156,7 +158,7 @@ python3 scripts/benchmark.py \
   --out runs/benchmark_20k.json
 ```
 
-On the development machine, the default 20,000-evaluation budget takes about 65 s for `poland_15` and 212 s for `poland_30`. Use `--max-evals 2000` while iterating, and `--repeat` or `--sweep` for sensitivity studies. See [docs/benchmarks.md](docs/benchmarks.md) for measured runtimes, the `M` sensitivity sweep, and recommended settings.
+On the development machine, the default 20,000-evaluation budget takes about 36 s for `poland_15` and 85 s for `poland_30`. Use `--max-evals 2000` while iterating, and `--repeat` or `--sweep` for sensitivity studies. See [docs/benchmarks.md](docs/benchmarks.md) for measured runtimes, the `M` sensitivity sweep, and recommended settings.
 
 ## Limitations
 

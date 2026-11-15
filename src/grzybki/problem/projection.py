@@ -28,7 +28,16 @@ class Projection:
         method: str = "equirectangular",
         crs: str = "EPSG:2180",
         margin: float = 0.05,
+        isotropic: bool = True,
     ) -> "Projection":
+        """Fit a projection whose normalized extent covers the points.
+
+        With ``isotropic=True`` (the default) both axes share one scale: the
+        shorter extent is padded symmetrically to match the longer one, so a
+        normalized unit is the same distance in every direction and
+        ``km_per_unit`` is defined. ``isotropic=False`` reproduces the
+        pre-v0.2 behaviour, which stretched x and y independently.
+        """
         lon = np.asarray(lon, dtype=float)
         lat = np.asarray(lat, dtype=float)
         if lon.shape != lat.shape:
@@ -53,6 +62,8 @@ class Projection:
 
         x_min, x_max = _expanded_bounds(x, margin)
         y_min, y_max = _expanded_bounds(y, margin)
+        if isotropic:
+            x_min, x_max, y_min, y_max = _square_bounds(x_min, x_max, y_min, y_max)
         transformer = _make_transformer(crs) if method == "epsg2180" else None
         return cls(
             method=method,
@@ -128,6 +139,24 @@ class Projection:
             raise ValueError(f"unsupported projection method: {self.method}")
         return np.column_stack([lon, lat])
 
+    @property
+    def is_isotropic(self) -> bool:
+        x_span = self.x_max - self.x_min
+        y_span = self.y_max - self.y_min
+        return abs(x_span - y_span) <= 1e-9 * max(abs(x_span), abs(y_span), 1.0)
+
+    @property
+    def km_per_unit(self) -> float | None:
+        """Kilometres per normalized unit, or ``None`` if axes are scaled unequally.
+
+        Exact for ``epsg2180`` (up to the projection's own scale distortion);
+        approximate for the local equirectangular projection, whose error
+        grows away from the reference latitude (a few per cent across Poland).
+        """
+        if not self.is_isotropic:
+            return None
+        return (self.x_max - self.x_min) / 1000.0
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "method": self.method,
@@ -176,6 +205,15 @@ def _expanded_bounds(values: np.ndarray, margin: float) -> tuple[float, float]:
         span = 1.0
     pad = margin * span
     return low - pad, high + pad
+
+
+def _square_bounds(
+    x_min: float, x_max: float, y_min: float, y_max: float
+) -> tuple[float, float, float, float]:
+    span = max(x_max - x_min, y_max - y_min)
+    x_mid = (x_min + x_max) / 2.0
+    y_mid = (y_min + y_max) / 2.0
+    return x_mid - span / 2.0, x_mid + span / 2.0, y_mid - span / 2.0, y_mid + span / 2.0
 
 
 def _equirectangular_forward(

@@ -14,6 +14,10 @@ The default is `K = n - 2`. The optimizer always clips candidates to `[0, 1]^(2K
 
 Coordinates are normalized after projection. The default projection is a local equirectangular projection with a 5% margin; `epsg2180` is available when `pyproj` is installed. Distances are Euclidean in the normalized plane.
 
+Normalization is **isotropic**: both axes share one scale, and the shorter extent is padded symmetrically to match the longer one. One normalized unit is therefore the same distance in every direction, and `Projection.km_per_unit` converts lengths to kilometres. For `poland_30` this is about 649 km per unit. The equirectangular approximation itself still distorts pairwise distances by up to about 6% across Poland relative to great-circle distances; use `epsg2180` when that matters.
+
+Runs created before this change normalized x and y independently. For `poland_30` that meant 649 km per unit east–west but 592 km north–south, so distances depended on direction by up to about 10%. Those manifests store the projected terminal coordinates, so old runs still reload and decode exactly as they were optimized; their `km_per_unit` is `None`. New runs produce slightly different `J` values for the same seed.
+
 ## 2. Decoder
 
 Given `x`:
@@ -59,6 +63,16 @@ FT = (|E| - B_sep) / |E|
 ```
 
 where `B_sep` is the number of bridges whose removal separates at least two terminals. Non-terminal bridges count as fault tolerant. If the graph is disconnected or has no edges, `FT = 0`.
+
+### Implementation notes
+
+- `D` uses `scipy.sparse.csgraph.dijkstra` from the terminals over a symmetric CSR matrix. Zero-length edges are clamped to `1e-12`, so the sparse matrix does not drop them.
+- `FT` uses one iterative depth-first search from terminal 0 (Tarjan low-link). For every bridge, it counts the terminals in the subtree below it, and the bridge separates terminals when that count is strictly between 0 and `n`.
+- Both replaced earlier NetworkX code. The test suite keeps the NetworkX version as an oracle and checks agreement on random graphs, including disconnected ones.
+
+### Kilometre fields
+
+When the instance has an isotropic projection, `Metrics.to_dict()` also reports `km_per_unit`, `C_km` and `C_mst_km`. These fields do not enter `J`, which is scale-free.
 
 ### Objective `J`
 

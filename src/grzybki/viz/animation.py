@@ -12,6 +12,7 @@ import numpy as np
 
 from ..problem.decoder import DecodedNetwork, NetworkProblem
 from ..problem.graph import NetworkGraph
+from .basemap import Basemap
 from .network import draw_network
 
 
@@ -22,6 +23,7 @@ def write_animation(
     *,
     fps: int = 10,
     dpi: int = 100,
+    basemap: Basemap | None = None,
 ) -> Path:
     if not snapshots:
         raise ValueError("snapshots are empty")
@@ -33,7 +35,9 @@ def write_animation(
     frames = []
     for snapshot in snapshots:
         decoded = problem.evaluate(np.asarray(snapshot["best_vector"], dtype=float))
-        frames.append(_render_frame(decoded, int(snapshot["t"]), dpi=dpi))
+        frames.append(
+            _render_frame(decoded, int(snapshot["t"]), dpi=dpi, basemap=basemap)
+        )
 
     suffix = output.suffix.lower()
     if suffix == ".gif":
@@ -51,9 +55,10 @@ def render_frame(
     *,
     title: str | None = None,
     dpi: int = 100,
+    basemap: Basemap | None = None,
 ) -> np.ndarray:
     fig, ax = plt.subplots(figsize=(6, 6), dpi=dpi)
-    draw_network(ax, graph, title=title or f"t = {t}")
+    draw_network(ax, graph, title=title or f"t = {t}", basemap=basemap)
     fig.tight_layout()
     fig.canvas.draw()
     frame = np.asarray(fig.canvas.buffer_rgba())[..., :3].copy()
@@ -61,6 +66,8 @@ def render_frame(
     return frame
 
 
-def _render_frame(decoded: DecodedNetwork, t: int, dpi: int) -> np.ndarray:
+def _render_frame(
+    decoded: DecodedNetwork, t: int, dpi: int, basemap: Basemap | None = None
+) -> np.ndarray:
     title = f"t = {t}    J = {decoded.metrics.objective:.4f}"
-    return render_frame(decoded.graph, t, title=title, dpi=dpi)
+    return render_frame(decoded.graph, t, title=title, dpi=dpi, basemap=basemap)

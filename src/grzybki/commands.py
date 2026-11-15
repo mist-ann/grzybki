@@ -15,6 +15,7 @@ from .problem.comparison import load_geojson_lines, project_lines
 from .problem.decoder import NetworkProblem
 from .problem.instance import Instance
 from .viz import (
+    build_basemap,
     plot_convergence,
     plot_decoded,
     plot_metrics,
@@ -151,6 +152,8 @@ def run_visualize(
     dpi: int = 140,
     reference: str | None = None,
     report: bool = True,
+    labels: bool = True,
+    outline: bool = True,
 ) -> None:
     artifacts = load_run(run_dir)
     manifest = artifacts.manifest
@@ -203,11 +206,14 @@ def run_visualize(
         if reference_payload is None:
             raise click.ClickException("reference file contains no line features")
 
+    basemap = build_basemap(instance, labels=labels, outline=outline)
     images["Network"] = plot_decoded(
         decoded,
         output / "network.png",
         title=f"Best network: {instance.name}",
         reference=reference_payload,
+        basemap=basemap,
+        dpi=dpi,
     )
 
     if animation:
@@ -221,6 +227,7 @@ def run_visualize(
             output / f"animation.{animation_format}",
             fps=fps,
             dpi=dpi,
+            basemap=basemap,
         )
 
     if report:

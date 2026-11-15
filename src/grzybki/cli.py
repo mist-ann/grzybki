@@ -118,6 +118,18 @@ def optimize(
     help="Optional GeoJSON reference rail lines.",
 )
 @click.option("--report/--no-report", default=True, show_default=True)
+@click.option(
+    "--labels/--no-labels",
+    default=True,
+    show_default=True,
+    help="Label terminals with their names.",
+)
+@click.option(
+    "--outline/--no-outline",
+    default=True,
+    show_default=True,
+    help="Draw the country border when a bundled outline matches the instance.",
+)
 def visualize(
     run_dir: str,
     out_dir: str | None,
@@ -127,6 +139,8 @@ def visualize(
     dpi: int,
     reference: str | None,
     report: bool,
+    labels: bool,
+    outline: bool,
 ) -> None:
     from .commands import run_visualize
 
@@ -139,4 +153,6 @@ def visualize(
         dpi=dpi,
         reference=reference,
         report=report,
+        labels=labels,
+        outline=outline,
     )

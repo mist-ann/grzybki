@@ -280,6 +280,8 @@ Execution rule: one logical change per commit. Run the relevant tests and a CLI 
 
 ### Phase 2 commits — real PKP PLK extension
 
+The detailed Phase 2 plan is in [`docs/PHASE2_PLAN.md`](docs/PHASE2_PLAN.md); it supersedes the outline below.
+
 These are separate after Phase 1 results:
 
 1. `feat(data): ingest real rail graph and station data`

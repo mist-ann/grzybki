@@ -49,6 +49,16 @@ python3 -m pip install -e '.[geo]'
 
 The projection metadata is recorded in `manifest.json`. Raw longitude/latitude values must not be passed directly to the decoder.
 
+## Country outline (bundled)
+
+`src/grzybki/data/outline_PL.geojson` is Poland's border from Natural Earth 1:50m admin-0 countries, v5.1.2, rounded to 4 decimals (6.5 KB, 316 points). `grzybki visualize` draws it under network plots. Natural Earth is public domain; plots carry the note "Made with Natural Earth". To regenerate it, or to add another country:
+
+```bash
+python3 scripts/build_country_outline.py --iso PL --scale 50m
+```
+
+The raw download is cached under `data/reference/` (gitignored). Only countries listed in `grzybki.viz.basemap.BUNDLED_OUTLINES` are considered when plotting.
+
 ## Optional fetchers
 
 Fetchers are optional, require network access, and write to `data/reference/`, which is ignored by Git. They cache raw responses so repeated runs do not re-query remote services.
