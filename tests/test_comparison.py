@@ -98,7 +98,7 @@ def test_polish_instances_load_and_project() -> None:
     for name, expected in [("poland_15", 15), ("poland_30", 30)]:
         instance = Instance.from_json(root / "data" / "instances" / f"{name}.json")
         assert instance.n == expected
-        assert instance.terminals[0].name == "Warszawa"
+        assert instance.terminals[0].name in {"Warszawa", "Warsaw"}
         instance.project()
         assert np.all((instance.xy >= 0.0) & (instance.xy <= 1.0))
         problem = NetworkProblem(instance, K=expected - 2)

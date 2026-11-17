@@ -146,7 +146,7 @@ def run_visualize(
     run_dir: str,
     out_dir: str | None,
     *,
-    animation: bool = False,
+    animation: bool = True,
     animation_format: str = "gif",
     fps: int = 10,
     dpi: int = 140,

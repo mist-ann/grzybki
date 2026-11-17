@@ -1,89 +1,93 @@
 {
   "name": "poland_15",
-  "description": "Curated Polish city terminal set for idealized FGO experiments.",
-  "source": "Approximate city-centre coordinates curated from public geographic references; verify before operational use.",
-  "license": "CC0-1.0 for this curated coordinate file.",
+  "description": "Polish settlement terminal set (15 largest places by population) for idealized FGO experiments.",
+  "source": "GeoNames Poland dump (PL.zip), download.geonames.org, retrieved 2026-11-17; see docs/data.md",
+  "license": "CC-BY-4.0 (GeoNames); attribution required.",
   "crs": "EPSG:4326",
   "terminals": [
     {
-      "name": "Warszawa",
-      "lon": 21.0122,
-      "lat": 52.2297
+      "name": "Warsaw",
+      "lon": 21.0118,
+      "lat": 52.2298
     },
     {
       "name": "Kraków",
-      "lon": 19.9445,
-      "lat": 50.0647
-    },
-    {
-      "name": "Łódź",
-      "lon": 19.456,
-      "lat": 51.7592
+      "lon": 19.9366,
+      "lat": 50.0614
     },
     {
       "name": "Wrocław",
-      "lon": 17.0385,
-      "lat": 51.1079
+      "lon": 17.0301,
+      "lat": 51.1029
+    },
+    {
+      "name": "Łódź",
+      "lon": 19.4739,
+      "lat": 51.7706
     },
     {
       "name": "Poznań",
-      "lon": 16.9252,
-      "lat": 52.4064
+      "lon": 16.9299,
+      "lat": 52.4069
     },
     {
       "name": "Gdańsk",
-      "lon": 18.6466,
-      "lat": 54.352
+      "lon": 18.6491,
+      "lat": 54.3523
     },
     {
       "name": "Szczecin",
-      "lon": 14.5528,
-      "lat": 53.4285
-    },
-    {
-      "name": "Bydgoszcz",
-      "lon": 18.004,
-      "lat": 53.1235
+      "lon": 14.553,
+      "lat": 53.4289
     },
     {
       "name": "Lublin",
-      "lon": 22.5684,
-      "lat": 51.2465
+      "lon": 22.5701,
+      "lat": 51.2506
+    },
+    {
+      "name": "Bydgoszcz",
+      "lon": 18.0076,
+      "lat": 53.1235
     },
     {
       "name": "Białystok",
-      "lon": 23.1688,
-      "lat": 53.1325
+      "lon": 23.1643,
+      "lat": 53.1333
     },
     {
       "name": "Katowice",
-      "lon": 19.0238,
-      "lat": 50.2649
+      "lon": 19.0217,
+      "lat": 50.2597
+    },
+    {
+      "name": "Gdynia",
+      "lon": 18.5319,
+      "lat": 54.5189
     },
     {
       "name": "Częstochowa",
-      "lon": 19.1203,
-      "lat": 50.8118
+      "lon": 19.1241,
+      "lat": 50.7965
+    },
+    {
+      "name": "Sosnowiec",
+      "lon": 19.1039,
+      "lat": 50.2868
     },
     {
       "name": "Radom",
       "lon": 21.1471,
-      "lat": 51.4027
-    },
-    {
-      "name": "Rzeszów",
-      "lon": 21.999,
-      "lat": 50.0413
-    },
-    {
-      "name": "Toruń",
-      "lon": 18.5984,
-      "lat": 53.0138
+      "lat": 51.4025
     }
   ],
   "metadata": {
-    "generator": "curated_city_centres",
-    "coordinate_precision": "approximately 0.001 degrees",
-    "notes": "Coordinates are approximate city centres, not station locations."
+    "generator": "geonames_population_ranking",
+    "retrieval_date": "2026-11-17",
+    "endpoint": "https://download.geonames.org/export/dump/PL.zip",
+    "selection": "Polish populated places (feature class P, excluding sections PPLX and historical/abandoned places, plus city districts recorded as standalone places) with population > 0, ranked by population",
+    "coordinate_precision": "approximately 0.0001 degrees",
+    "names": "Spelling follows GeoNames.",
+    "notes": "Coordinates are approximate settlement centres, not station locations. Nested prefix of the poland_5000 ranking."
   }
 }

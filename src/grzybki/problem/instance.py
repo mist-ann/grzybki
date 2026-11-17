@@ -213,6 +213,8 @@ def synthetic_instance(
         coordinates = _ring_points(n, seed)
     elif kind == "grid":
         coordinates = _grid_points(n)
+    elif kind == "polygon":
+        coordinates = _polygon_points(n, seed, **kwargs)
     else:
         raise ValueError(f"unknown synthetic instance kind: {kind}")
 
@@ -252,6 +254,37 @@ def _ring_points(n: int, seed: int) -> np.ndarray:
     points = np.column_stack(
         [0.5 + radius * np.cos(angles), 0.5 + radius * np.sin(angles)]
     )
+    return np.clip(points, 0.0, 1.0)
+
+
+def _polygon_points(n: int, seed: int, **kwargs: Any) -> np.ndarray:
+    """Place n terminals on the vertices of a regular n-gon.
+
+    Optional parameters (passed through ``synthetic_instance``):
+
+    - ``radius``: circumradius in the unit square (default 0.45).
+    - ``rotation_deg``: rotation of the first vertex in degrees (default -90,
+      so with n = 4 the first terminal sits at the top of the square).
+    - ``jitter``: standard deviation of Gaussian noise added to each vertex
+      (default 0.0, an exact regular polygon). Requires a seed.
+    """
+    radius = float(kwargs.get("radius", 0.45))
+    rotation_deg = float(kwargs.get("rotation_deg", -90.0))
+    jitter = float(kwargs.get("jitter", 0.0))
+    if not 0.0 < radius <= 0.5:
+        raise ValueError("radius must lie in (0, 0.5]")
+    if jitter < 0.0:
+        raise ValueError("jitter must be non-negative")
+
+    angles = np.deg2rad(rotation_deg) + np.linspace(
+        0.0, 2.0 * math.pi, n, endpoint=False
+    )
+    points = np.column_stack(
+        [0.5 + radius * np.cos(angles), 0.5 + radius * np.sin(angles)]
+    )
+    if jitter > 0.0:
+        rng = np.random.default_rng(seed)
+        points = points + rng.normal(0.0, jitter, size=points.shape)
     return np.clip(points, 0.0, 1.0)
 
 

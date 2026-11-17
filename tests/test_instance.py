@@ -56,12 +56,36 @@ def test_project_requires_lonlat() -> None:
 
 
 def test_synthetic_instances() -> None:
-    for kind in ["uniform", "clustered", "ring", "grid"]:
+    for kind in ["uniform", "clustered", "ring", "grid", "polygon"]:
         instance = synthetic_instance(kind, 15, seed=7)
         assert instance.n == 15
         assert instance.xy.shape == (15, 2)
         assert np.all((instance.xy >= 0.0) & (instance.xy <= 1.0))
         assert instance.metadata["generator"] == kind
+
+
+def test_polygon_synthetic_geometry() -> None:
+    instance = synthetic_instance("polygon", 6, seed=0)
+    assert instance.metadata["generator"] == "polygon"
+    xy = instance.xy
+    center = xy.mean(axis=0)
+    radii = np.linalg.norm(xy - center, axis=1)
+    assert np.allclose(radii, radii[0])
+    # Default rotation places the first vertex of the square at the top.
+    square = synthetic_instance("polygon", 4, seed=0).xy
+    assert np.allclose(square[0], [0.5, 0.5 - 0.45])
+    assert np.allclose(square[1], [0.5 + 0.45, 0.5])
+    # Exact polygons need no randomness and are reproducible.
+    assert np.array_equal(
+        synthetic_instance("polygon", 6, seed=0).xy,
+        synthetic_instance("polygon", 6, seed=1).xy,
+    )
+    # Jitter perturbs vertices but keeps them in the unit square.
+    jittered = synthetic_instance("polygon", 6, seed=2, jitter=0.02).xy
+    assert np.all((jittered >= 0.0) & (jittered <= 1.0))
+    assert not np.allclose(jittered, xy)
+    with pytest.raises(ValueError):
+        synthetic_instance("polygon", 6, seed=0, radius=0.9)
 
 
 def test_synthetic_reproducible() -> None:

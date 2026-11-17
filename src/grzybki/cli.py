@@ -102,7 +102,12 @@ def optimize(
 @main.command()
 @click.argument("run_dir", type=click.Path(exists=True, file_okay=False))
 @click.option("--out", "out_dir", type=click.Path(file_okay=False), default=None)
-@click.option("--animation", is_flag=True, help="Write a GIF or MP4 animation.")
+@click.option(
+    "--animation/--no-animation",
+    default=True,
+    show_default=True,
+    help="Write a GIF or MP4 animation.",
+)
 @click.option(
     "--animation-format",
     type=click.Choice(["gif", "mp4"]),

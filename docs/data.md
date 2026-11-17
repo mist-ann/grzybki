@@ -1,31 +1,44 @@
 # Data sources and formats
 
-## Curated instances
+## Poland instances
 
-The repository ships two offline terminal sets:
+`scripts/fetch_poland_cities.py` fetches a population ranking of Polish settlements from GeoNames and writes one instance file per size. All files are nested prefixes of one ranking, so `poland_15` is a subset of `poland_30`, which is a subset of `poland_50`, and so on:
 
 | File | Terminals | Purpose |
 | --- | --- | --- |
 | `data/instances/poland_15.json` | 15 | Fast experiments and smoke runs |
 | `data/instances/poland_30.json` | 30 | Main Phase 1 comparison runs |
+| `data/instances/poland_{50,100,500,1000,5000}.json` | 50–5,000 | Scaling studies and stress runs |
+
+Regenerate them (writes JSON files into `data/instances/`, caches the ~2 MB dump under `data/reference/`, which is ignored by Git):
+
+```bash
+python3 scripts/fetch_poland_cities.py                       # default ladder 15..5000
+python3 scripts/fetch_poland_cities.py --sizes 50 100        # subset
+python3 scripts/fetch_poland_cities.py --force               # re-download the dump
+```
+
+Provenance: GeoNames Poland dump (`https://download.geonames.org/export/dump/PL.zip`), retrieved 2026-11-17. Polish populated places (feature class `P`) with population > 0 are ranked by population; city sections (`PPLX`), historical/abandoned places, and districts recorded as standalone places (Warsaw boroughs, Fordon) are dropped so no city appears twice. Coordinates are rounded to 4 decimals (~11 m). Names follow GeoNames spelling (for example `Warsaw`, not `Warszawa`).
+
+Attribution: GeoNames, CC BY 4.0 — keep the attribution when redistributing derived data.
 
 Each file has this shape:
 
 ```json
 {
   "name": "poland_15",
-  "description": "Approximate city-centre terminals for an idealized Polish network",
-  "source": "Approximate city-centre coordinates; see docs/data.md",
-  "license": "CC0-1.0",
+  "description": "Polish settlement terminal set (15 largest places by population) for idealized FGO experiments.",
+  "source": "GeoNames Poland dump (PL.zip), download.geonames.org, retrieved 2026-11-17; see docs/data.md",
+  "license": "CC-BY-4.0 (GeoNames); attribution required.",
   "crs": "EPSG:4326",
   "terminals": [
-    {"name": "Warszawa", "lon": 21.0122, "lat": 52.2297},
-    {"name": "Krakow", "lon": 19.9445, "lat": 50.0647}
+    {"name": "Warsaw", "lon": 21.0111, "lat": 52.23},
+    {"name": "Kraków", "lon": 19.9366, "lat": 50.0614}
   ]
 }
 ```
 
-Coordinates are approximate city centres, not station locations. They are suitable for idealized experiments and must be replaced with verified station or node coordinates before operational use.
+Coordinates are approximate settlement centres, not station locations. They are suitable for idealized experiments and must be replaced with verified station or node coordinates before operational use.
 
 The files load without network access:
 
@@ -36,6 +49,35 @@ instance = Instance.from_json("data/instances/poland_15.json")
 instance.project()
 problem = NetworkProblem(instance, K=13)
 ```
+
+## Synthetic instances
+
+`data/instances/` also ships synthetic terminal sets produced by `scripts/gen_instances.py`. Their terminals carry unit-square `x`/`y` coordinates (`"crs": "unit-square"`), not longitude/latitude: plotting skips the country outline for them, and kilometre metrics such as `C_km` are unavailable because there is no geographic scale.
+
+| Files | Terminals | Layout |
+| --- | --- | --- |
+| `polygon_{15,30,50,100,500,1000,5000}.json` | 15, 30, 50, 100, 500, 1,000, 5,000 | exact vertices of a regular n-gon (radius 0.45, first vertex at the top) |
+| `uniform_{15,30,50,100,500,1000,5000}.json` | 15, 30, 50, 100, 500, 1,000, 5,000 | uniform random points, seed 0 |
+| `clustered_{15,30,50,100,500,1000,5000}.json` | 15, 30, 50, 100, 500, 1,000, 5,000 | 3 Gaussian clusters (spread 0.08), seed 0 |
+| `ring_{15,30,50,100,500,1000,5000}.json` | 15, 30, 50, 100, 500, 1,000, 5,000 | noisy ring around the centre, seed 0 |
+| `grid_{15,30,50,100,500,1000,5000}.json` | 15, 30, 50, 100, 500, 1,000, 5,000 | near-regular grid |
+
+This gives 35 reproducible synthetic instances across five layouts, from small smoke-test inputs to 5,000-terminal stress-test inputs. The larger sizes are useful for scaling tests and may require substantially more runtime and memory when optimized.
+
+The regular-polygon family gives controlled, highly symmetric benchmark sets; the exact polygon instances need no randomness and are fully reproducible, while a `--jitter` option perturbs the vertices.
+
+Generate the full size range (writes JSON files into `data/instances/` by default):
+
+```bash
+for kind in uniform clustered ring grid polygon; do
+  python3 scripts/gen_instances.py --kind "$kind" \
+    --sizes 15 30 50 100 500 1000 5000 --seed 0
+done
+```
+
+To generate only one layout or a subset of sizes, pass the desired `--kind` and `--sizes`, for example `python3 scripts/gen_instances.py --kind uniform --sizes 50 100 --seed 3`. The default invocation still generates only the default polygon family.
+
+In Python the same layouts are available through `grzybki.problem.synthetic_instance(kind, n, seed=...)` with `kind` in `uniform`, `clustered`, `ring`, `grid`, `polygon` (polygon accepts `radius`, `rotation_deg`, `jitter`).
 
 ## Projection
 
@@ -154,7 +196,7 @@ print(comparison["summary"])
 ## Data hygiene
 
 - Do not commit large raw downloads; `data/reference/` is ignored.
-- Keep curated instances small and reviewable.
+- Committed Poland/synthetic instances are produced by reviewed scripts; keep the scripts, not large raw downloads, as the source of truth.
 - Record the retrieval date, endpoint, query, and license for every external dataset.
 - Treat approximate city centres as placeholders, not as station coordinates.
 - Check that coordinates are in the expected CRS before projecting.
