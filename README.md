@@ -1,5 +1,7 @@
 # grzybki
 
+Full project report (in Polish) available here: [raport.pdf](./docs/Raport_Grzybki.pdf)
+
 Fungal Growth Optimizer (FGO) for idealized railway network design, with a focus on Polish city terminal sets.
 
 The project encodes a network as Steiner points plus a redundancy parameter, decodes each vector into a graph with an MST and extra Delaunay edges, and minimizes a normalized cost/detour/fault-tolerance objective. Phase 1 uses an idealized Euclidean decoder; real PKP PLK geometry and terrain-aware costs are Phase 2 work.
