@@ -2,17 +2,13 @@
 
 ## 1. Cel projektu
 
-Projekt implementuje algorytm **Fungal Growth Optimizer (FGO)** do optymalizacji idealizowanej sieci kolejowej.
+Celem projekt jest optymalizacja połączeń sieci kolejowej przy użyciu algorytmu inspirowanego naturą: **Fungal Growth Optimizer (FGO)**.
 
-Dany jest zbiór punktów reprezentujących miasta lub terminale. Algorytm szuka takiego układu punktów pośrednich i połączeń, aby otrzymać sieć:
+Algorytm szuka takiego układu punktów (miast/ terminali) pośrednich i połączeń, aby otrzymać sieć:
 
-- możliwie krótką,
-- zapewniającą krótkie trasy między terminalami,
+- możliwie krótką
+- zapewniającą krótkie trasy między terminalami
 - odporną na awarię pojedynczych krawędzi.
-
-Projekt jest eksperymentem z metaheurystyką. Nie jest jeszcze narzędziem do rzeczywistego projektowania linii kolejowych.
-
-Główna dokumentacja znajduje się w `README.md` oraz `algorithm_spec.md`.
 
 ---
 
@@ -105,13 +101,13 @@ x, y ∈ [0, 1]
 
 Klasa `Instance` w `instance.py` odpowiada za:
 
-- wczytanie pliku JSON,
-- walidację terminali,
-- przechowywanie nazw i współrzędnych,
-- projekcję współrzędnych,
-- tworzenie instancji syntetycznych.
+- wczytanie pliku JSON
+- walidację terminali
+- przechowywanie nazw i współrzędnych
+- odwzorowanie punktów
+- tworzenie fikcyjnych przykładów.
 
-Dostępne są instancje:
+Dostępne są instancje (np. do testów projektu):
 
 - polskie miejscowości, np. `poland_15`, `poland_30`,
 - punkty losowe,
@@ -122,16 +118,16 @@ Dostępne są instancje:
 
 ---
 
-# 4. Projekcja współrzędnych
+# 4. Odwzorowanie współrzędnych
 
-Algorytm nie działa bezpośrednio na długości i szerokości geograficznej.
+Algorytm nie działa bezpośrednio na długościach i szerokościach geograficznych.
 
-Współrzędne są zamieniane na płaszczyznę przez:
+Poszczególne współrzędne są zamieniane na płaszczyznę przez:
 
-- lokalną projekcję equirectangular — domyślnie,
-- EPSG:2180 — opcjonalnie, przez `pyproj`.
+- domyślnie: lokalną projekcję equirectangular,
+- opcjonalnie, przez `pyproj`: EPSG:2180.
 
-Następnie zakres jest normalizowany do:
+Następnie ich zakres jest normalizowany do:
 
 ```text
 [0, 1] × [0, 1]
